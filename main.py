@@ -1,5 +1,4 @@
 import openpyxl
-import tqdm
 import os
 
 # Load the workbook
@@ -13,7 +12,7 @@ def unmerge_cells(wb):
     merged_cells_ranges = list(wb.active.merged_cells.ranges)  # Create a copy
 
     # Loop through all merged cells
-    for merged_cells_range in tqdm.tqdm(merged_cells_ranges, desc="拆分合并单元格"):
+    for merged_cells_range in merged_cells_ranges:
         # Get the top-left cell value
         top_left_cell_value = merged_cells_range.start_cell.value
 
@@ -105,6 +104,51 @@ def calculate_scores(wb):
 
     return wb
 
+def calculate_scores_with_classify(wb):
+    sheet = wb.active
+
+    # Set headers for columns 13, 14, 15, 16, 17
+    sheet.cell(row=1, column=13, value="班级")
+    sheet.cell(row=1, column=14, value="升旗")
+    sheet.cell(row=1, column=15, value="两操")
+    sheet.cell(row=1, column=16, value="日常")
+    sheet.cell(row=1, column=17, value="周五检查")
+
+    # Initialize class names and scores
+    class_names = [f"高一（{i}）班" for i in range(1, 14)] + ["1"] + [f"高二（{i}）班" for i in range(1, 14)] + ["2"] + [f"高三（{i}）班"for i in range(1, 14)]
+    class_category_scores = {class_name: {"升旗": None, "两操": None, "日常": None, "周五检查": None} if class_name == "1" or class_name == "2"
+                                        else {"升旗": 0, "两操": 0, "日常": 0, "周五检查": 0} for class_name in class_names}
+    # Calculate scores for each class
+    for row in sheet.iter_rows(min_row=2, values_only=True):  # Skip header row
+        grade = row[2]
+        class_num = row[3].replace("班", "")  # Remove '班' from class number
+        score = float(row[4])
+        category = row[6]
+        class_name = f"{grade}（{class_num}）班"
+        if class_name in class_category_scores:
+            if category in class_category_scores[class_name]:
+                class_category_scores[class_name][category] -= score  # Subtract score because we want the opposite of the sum
+            else:
+                print(f"line {row} Unexpected category: {category}")
+                continue
+        else:
+            print(f"line {row} Unexpected class name: {class_name}")
+            continue
+
+    # Write class names to column 13
+    for i, class_name in enumerate(class_names, start=2):  # Skip header row
+        sheet.cell(row=i, column=13, value=class_name)
+
+
+    # Write class category scores to columns 14, 15, 16, 17
+    for i, (class_name, category_scores) in enumerate(class_category_scores.items(), start=2):  # Skip header row
+        sheet.cell(row=i, column=14, value=category_scores["升旗"])
+        sheet.cell(row=i, column=15, value=category_scores["两操"])
+        sheet.cell(row=i, column=16, value=category_scores["日常"])
+        sheet.cell(row=i, column=17, value=category_scores["周五检查"])
+
+    return wb
+
 def format_grade_and_class(wb):
     sheet = wb.active
     grade_mapping = {"高一": "1", "高二": "2", "高三": "3"}  # Add a mapping from grade names to numbers
@@ -112,7 +156,7 @@ def format_grade_and_class(wb):
     # Iterate over rows
     for row in sheet.iter_rows(min_row=2):  # Skip header row
         grade = grade_mapping.get(row[2].value, row[2].value)  # Use the mapping to convert grade names to numbers
-        class_num = row[3].value
+        class_num = row[3].value.replace("班", "")  # Remove '班' from class number
         formatted_value = f"{grade},{class_num}"
         row[7].value = formatted_value  # Write to the 8th column (0-indexed)
 
@@ -123,6 +167,6 @@ if __name__ == "__main__":
     wb = unmerge_cells(wb)
     wb = keep_max_rows(wb)
     wb = remove_zeros(wb)
-    wb = calculate_scores(wb)
+    wb = calculate_scores_with_classify(wb)
     wb = format_grade_and_class(wb)
     save_workbook(wb, path)
