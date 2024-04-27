@@ -4,7 +4,13 @@ import os
 # Load the workbook
 def load_workbook():
     path = input("输入表格路径：")
-    wb = openpyxl.load_workbook(path)
+    path = path.strip('\'"')
+    while True:
+        try:
+            wb = openpyxl.load_workbook(path)
+            break
+        except PermissionError:
+            input("请关闭文件后重试")
     return wb, path
 
 #拆分合并单元格
@@ -33,7 +39,11 @@ def save_workbook(wb, path):
     new_file_path = f"{file_path}_processed{extension}"
 
     # Save the workbook with the new file path
-    wb.save(new_file_path)
+    try:
+        wb.save(new_file_path)
+    except PermissionError:
+        input("请关闭文件后重试")
+        return save_workbook(wb, path)
     print(f"Workbook saved at {new_file_path}")
 
 def keep_max_rows(wb):
@@ -156,7 +166,9 @@ def format_grade_and_class(wb):
     # Iterate over rows
     for row in sheet.iter_rows(min_row=2):  # Skip header row
         grade = grade_mapping.get(row[2].value, row[2].value)  # Use the mapping to convert grade names to numbers
-        class_num = row[3].value.replace("班", "")  # Remove '班' from class number
+        #class_num = row[3].value.replace("班", "")  # Remove '班' from class number
+        class_num = row[3].value.replace("班", "") if row[3].value else None
+        if class_num is None: continue
         formatted_value = f"{grade},{class_num}"
         row[7].value = formatted_value  # Write to the 8th column (0-indexed)
 
