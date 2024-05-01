@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="7c826e56-f2f9-4909-af2a-aac150e9eb2a" name="更改" comment="修复了扣分明细过少时报错的问题,修复了文件被占用的时候报错的问题">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/icon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main.spec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/EXE-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/main.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/main.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/明细处理工具.exe" beforeDir="false" afterPath="$PROJECT_DIR$/明细处理工具.exe" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

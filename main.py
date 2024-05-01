@@ -1,5 +1,6 @@
 import openpyxl
 import os
+import atexit
 
 # Load the workbook
 def load_workbook():
@@ -185,6 +186,11 @@ def format_grade_and_class(wb):
         row[7].value = formatted_value  # Write to the 8th column (0-indexed)
 
     return wb
+
+def exit_handler():
+    input("按任意键退出")
+
+atexit.register(exit_handler)
 
 if __name__ == "__main__":
     wb, path = load_workbook()
