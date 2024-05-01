@@ -87,6 +87,18 @@ def remove_zeros(wb):
 
     return wb
 
+def absolute_values(wb):
+    sheet = wb.active
+
+    for row in sheet.iter_rows(min_row=2):  # Skip header row
+        try:
+            value = float(row[4].value)
+            row[4].value = abs(value)
+        except ValueError:
+            continue
+
+    return wb
+
 def calculate_scores(wb):
     sheet = wb.active
 
@@ -179,6 +191,7 @@ if __name__ == "__main__":
     wb = unmerge_cells(wb)
     wb = keep_max_rows(wb)
     wb = remove_zeros(wb)
+    wb = absolute_values(wb)
     wb = calculate_scores_with_classify(wb)
     wb = format_grade_and_class(wb)
     save_workbook(wb, path)
